@@ -2,21 +2,21 @@ import os
 import json
 
 
-def readJsonValues(directory, filename):
+def parseJSON(directory, filename):
     data=[]
-    jsonMetaList=[]
+    jsonMeta=[]
     #open all files that end with .json in <path> directory
     #and store certain attributes
-    if filename.endswith(".json"):
-        json_data=open(os.path.join(directory, filename))
-        data=json.load(json_data)
-        jsonMetaList.append(data['filesize'])
-        jsonMetaList.append(data['duration'])
-        jsonMetaList.append(data['samplerate'])
-        jsonMetaList.append(data['tags'])
-        jsonMetaList.append(data['type'])
+    json_data=open(os.path.join(directory, filename))
+    data=json.load(json_data)
+    jsonMeta.append(data['filesize'])
+    jsonMeta.append(data['duration'])
+    jsonMeta.append(data['samplerate'])
+    jsonMeta.append(data['tags'])
+    jsonMeta.append(data['type'])
 
-    return jsonMetaList
+    return jsonMeta
+
 
 def loadFiles(directory):
 
@@ -26,7 +26,7 @@ def loadFiles(directory):
         name , extension = file.rsplit('.',1);
         # parse and store meta-data to db
         if extension == "json":
-            jsonMeta = readJsonValues(directory, file)
+            jsonMeta = parseJson(directory, file)
             print(jsonMeta)
         elif extension == "csv":
             pass    # do something
