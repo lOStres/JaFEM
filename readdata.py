@@ -1,5 +1,6 @@
 import os
 import json
+import csv
 
 
 def parseJSON(directory, filename):
@@ -17,6 +18,12 @@ def parseJSON(directory, filename):
 
     return jsonMeta
 
+def parseCSV(directory, filename):
+    with open(os.path.join(directory, filename)) as csvfile:
+        csvMeta = csv.reader(csvfile, delimiter=",")
+        return list(csvMeta)
+
+
 
 def loadFiles(directory):
 
@@ -26,10 +33,10 @@ def loadFiles(directory):
         name , extension = file.rsplit('.',1);
         # parse and store meta-data to db
         if extension == "json":
-            jsonMeta = parseJson(directory, file)
-            print(jsonMeta)
+            jsonMeta = parseJSON(directory, file)
         elif extension == "csv":
-            pass    # do something
+            csvMeta = parseCSV(directory, file)
+            print(csvMeta)
         # retrieve link to sound file and store it to db
         else:
             pass    # do something
