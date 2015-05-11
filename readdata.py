@@ -1,22 +1,36 @@
+import os
 import json
 
 
-data=[]
-def readvalues(files):
-	lista=[]
-	#open all files that end with .json in <path> directory
-	#and store certain attributes
-	if files.endswith(".json"):
-		json_data=open(files)
-		data=json.load(json_data)
-		lista.append(data['filesize'])
-		lista.append(data['duration'])
-		lista.append(data['samplerate'])
-		lista.append(data['tags'])
-		lista.append(data['type'])
-		lista.append(data['geotag'])
-		
-	return lista
+def readJsonValues(directory, filename):
+    data=[]
+    jsonMetaList=[]
+    #open all files that end with .json in <path> directory
+    #and store certain attributes
+    if filename.endswith(".json"):
+        json_data=open(os.path.join(directory, filename))
+        data=json.load(json_data)
+        jsonMetaList.append(data['filesize'])
+        jsonMetaList.append(data['duration'])
+        jsonMetaList.append(data['samplerate'])
+        jsonMetaList.append(data['tags'])
+        jsonMetaList.append(data['type'])
 
-		
+    return jsonMetaList
+
+def loadFiles(directory):
+
+    print("Searching in directory: ", directory)
+
+    for file in os.listdir(directory):
+        name , extension = file.rsplit('.',1);
+        # parse and store meta-data to db
+        if extension == "json":
+            jsonMeta = readJsonValues(directory, file)
+            print(jsonMeta)
+        elif extension == "csv":
+            pass    # do something
+        # retrieve link to sound file and store it to db
+        else:
+            pass    # do something
 
