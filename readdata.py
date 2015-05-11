@@ -2,7 +2,7 @@ import os
 import json
 
 
-def parseJson(directory, filename):
+def parseJSON(directory, filename):
     data=[]
     jsonMeta=[]
     #open all files that end with .json in <path> directory
