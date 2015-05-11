@@ -1,0 +1,2 @@
+Rtree==0.8.2
+PySoundFile==0.7.0
