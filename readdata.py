@@ -8,7 +8,11 @@ def parseJSON(directory, filename):
     jsonMeta=[]
     #open all files that end with .json in <path> directory
     #and store certain attributes
-    json_data=open(os.path.join(directory, filename))
+    try:
+	json_data=open(os.path.join(directory, filename))
+    except(IOError, RuntimeError ):
+	print("Cannot open ", filename)
+
     data=json.load(json_data)
     jsonMeta.append(data['filesize'])
     jsonMeta.append(data['duration'])
