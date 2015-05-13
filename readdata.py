@@ -23,21 +23,19 @@ def parseCSV(directory, filename):
         csvMeta = csv.reader(csvfile, delimiter=",")
         return list(csvMeta)
 
-
-
 def loadFiles(directory):
 
     print("Searching in directory: ", directory)
 
     for file in os.listdir(directory):
         name , extension = file.rsplit('.',1);
-        # parse and store meta-data to db
+        # parse meta-data
         if extension == "json":
             jsonMeta = parseJSON(directory, file)
         elif extension == "csv":
             csvMeta = parseCSV(directory, file)
-            print(csvMeta)
-        # retrieve link to sound file and store it to db
+        # retrieve link to sound file
         else:
+
             pass    # do something
 
