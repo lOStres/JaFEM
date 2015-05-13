@@ -9,9 +9,9 @@ def parseJSON(directory, filename):
     #open all files that end with .json in <path> directory
     #and store certain attributes
     try:
-	json_data=open(os.path.join(directory, filename))
+        json_data=open(os.path.join(directory, filename))
     except(IOError, RuntimeError ):
-	print("Cannot open ", filename)
+        print("Cannot open ", filename)
 
     data=json.load(json_data)
     jsonMeta.append(data['filesize'])
@@ -25,21 +25,4 @@ def parseJSON(directory, filename):
 def parseCSV(directory, filename):
     with open(os.path.join(directory, filename)) as csvfile:
         csvMeta = csv.reader(csvfile, delimiter=",")
-        return list(csvMeta)
-
-def loadFiles(directory):
-
-    print("Searching in directory: ", directory)
-
-    for file in os.listdir(directory):
-        name , extension = file.rsplit('.',1);
-        # parse meta-data
-        if extension == "json":
-            jsonMeta = parseJSON(directory, file)
-        elif extension == "csv":
-            csvMeta = parseCSV(directory, file)
-        # retrieve link to sound file
-        else:
-
-            pass    # do something
-
+        return list(csvMeta)[0]
