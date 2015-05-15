@@ -16,7 +16,7 @@ def main():
 
             cur.execute('''CREATE TABLE metadata
                     (id INT PRIMARY KEY, filesize INT, duration FLOAT,
-                    samplerate INT, tags VARCHAR(20) ARRAY, type VARCHAR(7),
+                    samplerate INT, tags VARCHAR(200) ARRAY, type VARCHAR(7),
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
                     class VARCHAR(20));''')
             directory = "/home/klwnos/Documents/children_playing"
@@ -36,6 +36,10 @@ def main():
 
                 elif extension == "json":
                     meta = parseJSON(directory, file)
+
+                    query = 'UPDATE metadata SET filesize = %s, duration = %s, samplerate = %s, tags = %s, type = %s WHERE id = %s;'
+                    data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
+                    cur.execute(query, data)
                 else:
 
                     pass    # do something
