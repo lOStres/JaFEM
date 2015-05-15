@@ -30,7 +30,7 @@ def parseCSV(directory, filename):
         return list(csvMeta)[0]
 
 
-#returns a vector with (currently)  9 features
+#returns a vector with (currently)  4 features
 def extractFeatures(directory,filename):
 	try:
 		data,samplerate=sf.read(os.path.join(directory, filename))
@@ -40,7 +40,7 @@ def extractFeatures(directory,filename):
 		sys.exit()
 	#if file was opened succesfully proceed with feature extraction
 	#win is the size of window for mfcc extraction AND step size
-	win=data.size/(8*samplerate)
+	win=data.size/(4*samplerate)
 	featureVector=mfcc(data,samplerate,win,win,1)
 	#featureVector is of type numpy_array
 	return featureVector
@@ -58,6 +58,7 @@ def main():
 	featureVector=extractFeatures(directory,filename)
 	featureVector1=extractFeatures(directory,filename1)
 	print(featureVector1)
+	print(featureVector)
 
 
 if __name__ == "__main__":
