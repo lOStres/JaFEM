@@ -64,7 +64,6 @@ def main():
             cur = con.cursor()
 
             cur.execute("DROP TABLE metadata")
-            con.commit()
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
@@ -73,6 +72,7 @@ def main():
         finally:
 
             if con:
+                con.commit()
                 con.close()
 
 if __name__ == "__main__":
