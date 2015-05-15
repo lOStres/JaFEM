@@ -1,6 +1,9 @@
 
 import psycopg2
 import sys
+import soundfile as sf
+from scipy.fftpack import dct
+from features import *
 
 from readdata import *
 
@@ -23,15 +26,15 @@ def main():
 
             print("scanning directory", directory)
             # scanning directory and inserting values to db
-            for file in os.listdir(directory):
-                name , extension = file.rsplit('.',1);
+            for filename in os.listdir(directory):
+                name , extension = filename.rsplit('.',1);
 
                 if not name:
                     continue;
 
                 # parse meta-data
                 if extension == "csv":
-                    meta = parseCSV(directory, file)
+                    meta = parseCSV(directory, filename)
 
                     query = """INSERT INTO metadata
                     (id, startime, endtime, saliance, class)
@@ -40,7 +43,7 @@ def main():
                     cur.execute(query, data)
 
                 elif extension == "json":
-                    meta = parseJSON(directory, file)
+                    meta = parseJSON(directory, filename)
 
                     query = """UPDATE metadata SET filesize = %s,
                     duration = %s, samplerate = %s, tags = %s, type = %s
@@ -48,7 +51,7 @@ def main():
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
                     cur.execute(query, data)
                 else:
-
+		    featureVector=extractFeatures(directory,filename)
                     query = """UPDATE metadata SET link = %s
                     WHERE id = %s;"""
                     data = (directory + '/' + name + '.' + extension, name)
