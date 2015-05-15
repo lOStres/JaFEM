@@ -18,7 +18,7 @@ def main():
                     (id INT PRIMARY KEY, filesize INT, duration FLOAT,
                     samplerate INT, tags VARCHAR(200) ARRAY, type VARCHAR(7),
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
-                    class VARCHAR(20));''')
+                    class VARCHAR(20), link VARCHAR(200));''')
             directory = "/home/klwnos/Documents/children_playing"
 
             print("scanning directory", directory)
@@ -26,23 +26,33 @@ def main():
             for file in os.listdir(directory):
                 name , extension = file.rsplit('.',1);
 
+                if not name:
+                    continue;
+
                 # parse meta-data
                 if extension == "csv":
                     meta = parseCSV(directory, file)
 
-                    query = 'INSERT INTO metadata (id, startime, endtime, saliance, class) VALUES (%s, %s, %s, %s, %s);'
+                    query = """INSERT INTO metadata
+                    (id, startime, endtime, saliance, class)
+                    VALUES (%s, %s, %s, %s, %s);"""
                     data = (name, meta[0], meta[1], meta[2], meta[3])
                     cur.execute(query, data)
 
                 elif extension == "json":
                     meta = parseJSON(directory, file)
 
-                    query = 'UPDATE metadata SET filesize = %s, duration = %s, samplerate = %s, tags = %s, type = %s WHERE id = %s;'
+                    query = """UPDATE metadata SET filesize = %s,
+                    duration = %s, samplerate = %s, tags = %s, type = %s
+                    WHERE id = %s;"""
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
                     cur.execute(query, data)
                 else:
 
-                    pass    # do something
+                    query = """UPDATE metadata SET link = %s
+                    WHERE id = %s;"""
+                    data = (directory + '/' + name + '.' + extension, name)
+                    cur.execute(query, data)
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
