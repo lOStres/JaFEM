@@ -14,7 +14,7 @@ def main():
 
         con = None
         try:
-
+	#prepei na allaksei auto gia na mporw na to xrhsimopoihsw
             con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
@@ -61,6 +61,7 @@ def main():
                 else:
 
                     print("a")
+		    #h soundfile den doulevei gia .mp3
                     featureV = extractFeatures(directory,filename)
                     link = directory + '/' + name + '.' + extension
                     #insert to spatialindex
