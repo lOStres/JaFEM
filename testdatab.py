@@ -14,8 +14,8 @@ def main():
 
         con = None
         try:
-
-            con = psycopg2.connect(database='testdb', user='klwnos')
+	        # TODO prepei na allaksei auto gia na mporoume na to xrhsimopoioume kai oi 2
+            con = psycopg2.connect(database='testdb2', user='tabrianos')
             cur = con.cursor()
 
             cur.execute('''CREATE TABLE metadata
@@ -23,14 +23,15 @@ def main():
                     samplerate INT, tags VARCHAR(200) ARRAY, type VARCHAR(7),
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
                     class VARCHAR(20), link VARCHAR(200));''')
-            directory = "/home/klwnos/Documents/children_playing"
+            # TODO kai auto pepei na allaksei		
+            directory = "/home/tabrianos/Desktop/vaseis/test"
 
-            # create or open spatialindex
+            # create or open spatial index
             p = index.Property()
             p.dimension = 4
             rtree = index.Rtree(properties = p)
             mbr = (0, 0, 0, 0, 0.001, 0.001, 0.001, 0.001)
-
+            index_id = 1
 
             print("scanning directory", directory)
             # scanning directory and inserting values to db
@@ -54,25 +55,26 @@ def main():
                     meta = parseJSON(directory, filename)
 
                     query = """UPDATE metadata SET filesize = %s,
-                    duration = %s, samplerate = %s, tags = %s, type = %s
-                    WHERE id = %s;"""
+                        duration = %s, samplerate = %s, tags = %s, type = %s
+                        WHERE id = %s;"""
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
                     cur.execute(query, data)
                 else:
+                    # TODO soundfile doesnt work for .mp3, for now just excluding them
+                    if(not(filename.endswith('.mp3'))):
+                        featureV = extractFeatures(directory,filename)
+                        link = directory + '/' + name + '.' + extension
+		                #insert to spatialindex
+                        rtree.insert(index_id, (featureV[0][0], featureV[1][0],
+                            featureV[2][0], featureV[3][0], featureV[0][0],
+                            featureV[1][0], featureV[2][0], featureV[3][0]),
+                            obj = link)
+                        index_id+=1
 
-                    print("a")
-                    featureV = extractFeatures(directory,filename)
-                    link = directory + '/' + name + '.' + extension
-                    #insert to spatialindex
-                    rtree.insert(1, (featureV[0][0], featureV[1][0],
-                        featureV[2][0], featureV[3][0], featureV[0][0],
-                        featureV[1][0], featureV[2][0], featureV[3][0]),
-                        obj = link)
-
-                    query = """UPDATE metadata SET link = %s
-                    WHERE id = %s;"""
-                    data = (link, name)
-                    cur.execute(query, data)
+                        query = """UPDATE metadata SET link = %s
+                            WHERE id = %s;"""
+                        data = (link, name)
+                        cur.execute(query, data)
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
@@ -89,8 +91,8 @@ def main():
 
         con = None
         try:
-
-            con = psycopg2.connect(database='testdb', user='klwnos')
+            #kai auto prepei na allaksei
+            con = psycopg2.connect(database='testdb2', user='tabrianos')
             cur = con.cursor()
 
             cur.execute("DROP TABLE metadata")
