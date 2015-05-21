@@ -64,7 +64,10 @@ def main():
                     featureV = extractFeatures(directory,filename)
                     link = directory + '/' + name + '.' + extension
                     #insert to spatialindex
-                    rtree.insert(1, (featureV[0][0], featureV[1][0], featureV[2][0], featureV[3][0], featureV[0][0], featureV[1][0], featureV[2][0], featureV[3][0]), obj = link)
+                    rtree.insert(1, (featureV[0][0], featureV[1][0],
+                        featureV[2][0], featureV[3][0], featureV[0][0],
+                        featureV[1][0], featureV[2][0], featureV[3][0]),
+                        obj = link)
 
                     query = """UPDATE metadata SET link = %s
                     WHERE id = %s;"""
