@@ -1,11 +1,8 @@
 
 import psycopg2
 import sys
-import soundfile as sf
 
 from rtree import index
-from scipy.fftpack import dct
-from features import *
 from readdata import *
 
 def main():
@@ -24,13 +21,16 @@ def main():
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
                     class VARCHAR(20), link VARCHAR(200));''')
             # TODO kai auto pepei na allaksei		
-            directory = "/home/tabrianos/Desktop/vaseis/test"
+            directory = "/home/klwnos/Documents/children_playing"
 
             # create or open spatial index
             p = index.Property()
-            p.dimension = 4
-            rtree = index.Rtree(properties = p)
-            mbr = (0, 0, 0, 0, 0.001, 0.001, 0.001, 0.001)
+            p.dat_extension = 'data'
+            p.idx_extension = 'index'
+            p.dimension = 2
+
+            rtree = index.Index('rtreez', properties = p)
+            mbr = (0.00000, 0.00000, 0.00001, 0.00001)
             index_id = 1
 
             print("scanning directory", directory)
@@ -59,22 +59,25 @@ def main():
                         WHERE id = %s;"""
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
                     cur.execute(query, data)
-                else:
-                    # TODO soundfile doesnt work for .mp3, for now just excluding them
-                    if(not(filename.endswith('.mp3'))):
-                        featureV = extractFeatures(directory,filename)
-                        link = directory + '/' + name + '.' + extension
-		                #insert to spatialindex
-                        rtree.insert(index_id, (featureV[0][0], featureV[1][0],
-                            featureV[2][0], featureV[3][0], featureV[0][0],
-                            featureV[1][0], featureV[2][0], featureV[3][0]),
-                            obj = link)
-                        index_id+=1
 
-                        query = """UPDATE metadata SET link = %s
-                            WHERE id = %s;"""
-                        data = (link, name)
-                        cur.execute(query, data)
+                else:
+                    featureV = extractFeatures(directory,filename)
+
+                    link = directory + '/' + name + '.' + extension
+
+                    #insert to spatialindex
+                    size = featureV['mfcc'].shape[0]
+                    for i in range(0, size):
+                        rtree.insert(index_id, (featureV['mfcc'][i,0],
+                            featureV['psp'][i,0], featureV['mfcc'][i,0],
+                            featureV['psp'][i,0]),
+                            obj = link)
+                    index_id += 1
+
+                    query = """UPDATE metadata SET link = %s
+                        WHERE id = %s;"""
+                    data = (link, name)
+                    cur.execute(query, data)
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
