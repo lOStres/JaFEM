@@ -1,9 +1,7 @@
 import os,sys
 import json
 import csv
-import soundfile as sf
-from scipy.fftpack import dct
-from features import mfcc,fbank,sigproc,logfbank
+from yaafelib import *
 
 def parseJSON(directory, filename):
     data=[]
@@ -30,17 +28,18 @@ def parseCSV(directory, filename):
         return list(csvMeta)[0]
 
 
-#returns a vector with (currently)  4 features
+#returns a vector with 2 features
 def extractFeatures(directory,filename):
-	try:
-		data,samplerate=sf.read(os.path.join(directory, filename))
-	except (IOError, RuntimeError):
-		print("Could not open file ", filename)
-		print("Exiting...")
-		sys.exit()
-	#if file was opened succesfully proceed with feature extraction
-	#win is the size of window for mfcc extraction AND step size
-	win=data.size/(4*samplerate)
-	featureVector=mfcc(data,samplerate,win,win,1)
-	#featureVector is of type numpy_array
-	return featureVector
+    # yaaaaafe
+    fp = FeaturePlan(sample_rate=44100, resample=True)
+    fp.addFeature('mfcc: MFCC blockSize=512 stepSize=256 CepsNbCoeffs=1')
+    fp.addFeature('psp: PerceptualSpread blockSize=512 stepSize=256')
+    df = fp.getDataFlow()
+    engine = Engine()
+    engine.load(df)
+    afp = AudioFileProcessor()
+
+    afp.processFile(engine,os.path.join(directory, filename))
+    featureVector = engine.readAllOutputs()
+
+    return featureVector
