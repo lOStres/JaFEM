@@ -2,12 +2,14 @@
 Just another Feature Extraction Machine
 
 ### Dependencies
-You will need python (preferably but not absolutely necessary python3)<br>
-(Better) install next libraries with your package manager
+You will need python 2 with the following libraries<br>
+* Yaafe (better follow the installation guide in the official [documentation](http://yaafe.sourceforge.net/manual/install.html))
 * libspatialindex (c++ library for spatial indexes, needed for <b>Rtree</b>)
-* libsndfile1 (for <b>PySoundFile</b>)
-* postgreSQL
-* libpq-dev (for <b>postgreSQL</b>)
+* postgreSQL (with python bindings)
 
 ### requirements
 Inside project directory run `pip -r requirements.txt`
+
+## Authors
+* gryllos@ceid.upatras.gr
+* skalidis@ceid.upatras.gr
