@@ -32,14 +32,13 @@ def parseCSV(directory, filename):
 def extractFeatures(directory,filename):
     # yaaaaafe
     fp = FeaturePlan(sample_rate=44100, resample=True)
-    fp.addFeature('mfcc: MFCC blockSize=512 stepSize=256 CepsNbCoeffs=1')
-    fp.addFeature('psp: PerceptualSpread blockSize=512 stepSize=256')
+    fp.addFeature('mfcc: MFCC blockSize=1024 stepSize=512')
     df = fp.getDataFlow()
     engine = Engine()
     engine.load(df)
     afp = AudioFileProcessor()
 
     afp.processFile(engine,os.path.join(directory, filename))
-    featureVector = engine.readAllOutputs()
+    featureValues = engine.readAllOutputs()
 
-    return featureVector
+    return featureValues
