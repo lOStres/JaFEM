@@ -1,6 +1,7 @@
 
-import psycopg2
 import sys
+import psycopg2
+import numpy
 
 from rtree import index
 from readdata import *
@@ -27,10 +28,9 @@ def main():
             p = index.Property()
             p.dat_extension = 'data'
             p.idx_extension = 'index'
-            p.dimension = 2
+            p.dimension = 13
 
-            rtree = index.Index('rtreez', properties = p)
-            mbr = (0.00000, 0.00000, 0.00001, 0.00001)
+            rtree = index.Index('rtreez', properties=p, interleaved=True)
             index_id = 1
 
             print("scanning directory", directory)
@@ -61,17 +61,22 @@ def main():
                     cur.execute(query, data)
 
                 else:
-                    featureV = extractFeatures(directory,filename)
+                    feats = extractFeatures(directory,filename)
+                    featureVector = numpy.mean(feats['mfcc'], axis=0)
 
                     link = directory + '/' + name + '.' + extension
 
                     #insert to spatialindex
-                    size = featureV['mfcc'].shape[0]
-                    for i in range(0, size):
-                        rtree.insert(index_id, (featureV['mfcc'][i,0],
-                            featureV['psp'][i,0], featureV['mfcc'][i,0],
-                            featureV['psp'][i,0]),
-                            obj = link)
+                    rtree.insert(index_id, (featureVector[0], featureVector[1],
+                        featureVector[2], featureVector[3], featureVector[4],
+                        featureVector[5], featureVector[6], featureVector[7],
+                        featureVector[8], featureVector[9], featureVector[10],
+                        featureVector[11], featureVector[12], featureVector[0],
+                        featureVector[1], featureVector[2], featureVector[3],
+                        featureVector[4], featureVector[5], featureVector[6],
+                        featureVector[7], featureVector[8], featureVector[9],
+                        featureVector[10], featureVector[11],
+                        featureVector[12]), obj=link)
                     index_id += 1
 
                     query = """UPDATE metadata SET link = %s
