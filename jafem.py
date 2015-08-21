@@ -35,7 +35,7 @@ def main():
         con = None
         try:
 	        # TODO prepei na allaksei auto gia na mporoume na to xrhsimopoioume kai oi 2
-            con = psycopg2.connect(database='testdb2', user='tabrianos')
+            con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
             cur.execute('''CREATE TABLE metadata
@@ -119,8 +119,8 @@ def main():
 
         con = None
         try:
-            #kai auto prepei na allaksei
-            con = psycopg2.connect(database='testdb2', user='tabrianos')
+            # TODO kai auto prepei na allaksei
+            con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
             cur.execute("DROP TABLE metadata")
