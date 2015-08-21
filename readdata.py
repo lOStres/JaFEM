@@ -1,6 +1,8 @@
 import os,sys
 import json
 import csv
+import numpy
+
 from yaafelib import *
 
 def parseJSON(directory, filename):
@@ -28,7 +30,7 @@ def parseCSV(directory, filename):
         return list(csvMeta)[0]
 
 
-#returns a vector with 2 features
+#returns a  13 dimensional vector with the mean values of mfccs
 def extractFeatures(directory,filename):
     # yaaaaafe
     fp = FeaturePlan(sample_rate=44100, resample=True)
@@ -39,6 +41,7 @@ def extractFeatures(directory,filename):
     afp = AudioFileProcessor()
 
     afp.processFile(engine,os.path.join(directory, filename))
-    featureValues = engine.readAllOutputs()
+    feats = engine.readAllOutputs()
+    featureVector = numpy.mean(feats['mfcc'], axis=0)
 
-    return featureValues
+    return featureVector

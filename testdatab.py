@@ -61,13 +61,12 @@ def main():
                     cur.execute(query, data)
 
                 else:
-                    feats = extractFeatures(directory,filename)
-                    featureVector = numpy.mean(feats['mfcc'], axis=0)
+                    featureVector = extractFeatures(directory,filename)
 
                     link = directory + '/' + name + '.' + extension
 
                     #insert to spatialindex
-                    rtree.insert(index_id, (featureVector[0], featureVector[1],
+                    rtree.insert(int(name), (featureVector[0], featureVector[1],
                         featureVector[2], featureVector[3], featureVector[4],
                         featureVector[5], featureVector[6], featureVector[7],
                         featureVector[8], featureVector[9], featureVector[10],
@@ -76,8 +75,7 @@ def main():
                         featureVector[4], featureVector[5], featureVector[6],
                         featureVector[7], featureVector[8], featureVector[9],
                         featureVector[10], featureVector[11],
-                        featureVector[12]), obj=link)
-                    index_id += 1
+                        featureVector[12]))
 
                     query = """UPDATE metadata SET link = %s
                         WHERE id = %s;"""
