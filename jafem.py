@@ -24,7 +24,7 @@ def contentQuery(directory, filename, k):
         featureVector[0], featureVector[1], featureVector[2], featureVector[3],
         featureVector[4], featureVector[5], featureVector[6], featureVector[7],
         featureVector[8], featureVector[9], featureVector[10],
-        featureVector[11], featureVector[12]), 5))
+        featureVector[11], featureVector[12]), k))
     print(similar)
 
 
