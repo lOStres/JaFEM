@@ -5,6 +5,8 @@ import psycopg2
 from rtree import index
 from readdata import *
 
+from gui import UI
+
 # perform k-NN search for file in spatial index
 def contentQuery(directory, filename, k):
     # first extract features from query file
@@ -42,6 +44,9 @@ def metaQuery(filename):
     return records
 
 def main():
+    ex=wx.App()
+    UI(None)
+    ex.MainLoop()
     # initialize table metadata
     if len(sys.argv) == 2 and sys.argv[1] == '-i':
 

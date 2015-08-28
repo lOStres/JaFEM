@@ -1,5 +1,5 @@
 import wx
-import pyHook,pythoncom,pygame, datetime, os
+import datetime, os
 
 
 APP_EXIT=1
@@ -40,14 +40,14 @@ class UI(wx.Frame):
         fileMenu=wx.Menu()
         viewMenu=wx.Menu()
         
-        kneighbText = wx.TextCtrl(panel, size=(140, -1), pos=(80,30))
-        metadataText =  wx.TextCtrl(panel, size=(140, -1), pos=(120,60))
+        kneighbText = wx.TextCtrl(panel, size=(140, -1), pos=(100,30))
+        metadataText =  wx.TextCtrl(panel, size=(140, -1), pos=(150,60))
         
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
 
 
         
-        self.SetSize((300,175))
+        self.SetSize((320,175))
         self.SetTitle('KeyLogger')
         self.Centre()
         self.Show(True)
@@ -158,7 +158,7 @@ class UI(wx.Frame):
                 con.close()
 
 
-    def dropDB():
+    def dropDB(self,e):
         con = None
         try:
             # TODO kai auto prepei na allaksei
@@ -192,7 +192,7 @@ class UI(wx.Frame):
         cur.execute(query, data)
         records = cur.fetchall()
 
-    return records
+        return records
 
 
     def OnRightDown(self,e):
