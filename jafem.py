@@ -27,6 +27,19 @@ def contentQuery(directory, filename, k):
         featureVector[11], featureVector[12]), k))
     print(similar)
 
+# perform search on name of file and display information
+def metaQuery(filename):
+
+    con = psycopg2.connect(database='testdb', user='klwnos')
+    cur = con.cursor()
+
+    query = """SELECT * FROM metadata
+            WHERE id = %s;"""
+    data = (filename,)
+    cur.execute(query, data)
+    records = cur.fetchall()
+
+    return records
 
 def main():
     # initialize table metadata
@@ -139,6 +152,11 @@ def main():
     elif len(sys.argv) == 2 and sys.argv[1] == '-q':
 
         contentQuery("/home/klwnos/Documents/children_playing", "12.mp3", 5)
+
+    # meta data query
+    elif len(sys.argv) == 2 and sys.argv[1] == '-m':
+
+        metaQuery("12")
 
 
 if __name__ == "__main__":
