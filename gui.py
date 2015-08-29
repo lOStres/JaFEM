@@ -1,5 +1,9 @@
 import wx
 import datetime, os
+from rtree import index
+import psycopg2
+import sys
+from readdata import *
 
 
 APP_EXIT=1
@@ -78,7 +82,7 @@ class UI(wx.Frame):
         con = None
         try:
             # TODO prepei na allaksei auto gia na mporoume na to xrhsimopoioume kai oi 2
-            con = psycopg2.connect(database='testdb', user='klwnos')
+            con = psycopg2.connect(database='testdb2', user='tabrianos')
             cur = con.cursor()
 
             cur.execute('''CREATE TABLE metadata
@@ -87,7 +91,7 @@ class UI(wx.Frame):
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
                     class VARCHAR(20), link VARCHAR(200));''')
             # TODO kai auto pepei na allaksei       
-            directory = "/home/klwnos/Documents/children_playing"
+            directory = os.path.dirname(os.path.abspath(__file__))+'/children_playing'
 
             # create or open spatial index
             p = index.Property()
@@ -162,7 +166,7 @@ class UI(wx.Frame):
         con = None
         try:
             # TODO kai auto prepei na allaksei
-            con = psycopg2.connect(database='testdb', user='klwnos')
+            con = psycopg2.connect(database='testdb2', user='tabrianos')
             cur = con.cursor()
 
             cur.execute("DROP TABLE metadata")
