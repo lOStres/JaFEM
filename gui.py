@@ -1,9 +1,9 @@
-import wx
-import datetime, os
-from rtree import index
-import psycopg2
-import sys
+from jafem import *
 from readdata import *
+from rtree import index
+
+import wx
+import psycopg2
 
 
 APP_EXIT=1

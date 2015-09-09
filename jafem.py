@@ -1,14 +1,9 @@
-
-import sys
-import psycopg2
-
-from rtree import index
+import sys, os
 from readdata import *
-
-from gui import UI
+from rtree import index
 
 # perform k-NN search for file in spatial index
-def contentQuery(directory, filename, k):
+def similarity(directory, filename, k):
     # first extract features from query file
     featureVector = extractFeatures(directory,filename)
 
