@@ -15,74 +15,81 @@ class UI(wx.Frame):
         self.InitUI()
         self.dirname=''
         self.filename=''
-        
-
 
 
     def InitUI(self):
-        global editname,metadataText
+        global kneighbText, metadataText
         panel=wx.Panel(self)
         panel.SetBackgroundColour('#4f5049')
         vbox=wx.BoxSizer(wx.VERTICAL)
         
-        butt1=wx.Button(panel,label='Search song',pos=(0,30))
-        butt1.Bind(wx.EVT_BUTTON, self.OnOpen)
+        butt1=wx.Button(panel,label='Find k most similar',pos=(10,10))
+        butt1.Bind(wx.EVT_BUTTON, self.contentQuery)
 
-        butt2=wx.Button(panel,label='Initialize Databae',pos=(0,0))
-        butt2.Bind(wx.EVT_BUTTON, self.initializeDB)
-
-        
-
-        butt3=wx.Button(panel, label='Search by metadata', pos=(0,60))
-        butt3.Bind(wx.EVT_BUTTON, self.metadataQuery)
-
-        butt4=wx.Button(panel, label='Drop Database', pos=(0,90))
+        butt4=wx.Button(panel, label='Drop DB', pos=(190,100))
         butt4.Bind(wx.EVT_BUTTON, self.dropDB)
 
-        
+        butt2=wx.Button(panel,label='Initialize DB',pos=(40,100))
+        butt2.Bind(wx.EVT_BUTTON, self.initializeDB)
+
+        butt3=wx.Button(panel, label='Search by name', pos=(10,40))
+        butt3.Bind(wx.EVT_BUTTON, self.metadataQuery)
+
         menubar=wx.MenuBar()
         fileMenu=wx.Menu()
         viewMenu=wx.Menu()
         
-        kneighbText = wx.TextCtrl(panel, size=(140, -1), pos=(100,30))
-        metadataText =  wx.TextCtrl(panel, size=(140, -1), pos=(150,60))
+        kneighbText = wx.TextCtrl(panel, size=(140, -1), pos=(160,10))
+        metadataText =  wx.TextCtrl(panel, size=(140, -1), pos=(160,40))
         
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
 
-
         
         self.SetSize((320,175))
-        self.SetTitle('KeyLogger')
+        self.SetTitle('JaFEM')
         self.Centre()
         self.Show(True)
 
 
-    
-
     def OnQuit(self,e):
         logfile.close()
         self.Close()
-        
 
-
-        
-    def OnOpen(self,e):
+    # make content-based query
+    def contentQuery(self,e):
         global kneighbText
-        kneighbours = editname.GetValue()
+        kneighbours = kneighbText.GetValue()
         print(kneighbours)
         dlg=wx.FileDialog(self,"Choose a file", self.dirname,"", "*.*", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetFilename()
             self.dirname = dlg.GetDirectory()
-            print(self.filename)
-            print(self.dirname)
+            nearest = similarity(self.dirname, self.filename, int(kneighbours))
+            print(nearest)
         dlg.Destroy()
 
+    # make metadata based query
+    def metadataQuery(self,e):
+
+        global metadataText
+        filename = str(metadataText.GetValue())
+
+        con = psycopg2.connect(database='testdb', user='klwnos')
+        cur = con.cursor()
+
+        query = """SELECT * FROM metadata
+                WHERE id = %s;"""
+        data = (filename,)
+        cur.execute(query, data)
+        records = cur.fetchall()
+        print(records)
+
+    # initialize db and spatial index
     def initializeDB(self,e):
         con = None
         try:
             # TODO prepei na allaksei auto gia na mporoume na to xrhsimopoioume kai oi 2
-            con = psycopg2.connect(database='testdb2', user='tabrianos')
+            con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
             cur.execute('''CREATE TABLE metadata
@@ -91,7 +98,7 @@ class UI(wx.Frame):
                     saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
                     class VARCHAR(20), link VARCHAR(200));''')
             # TODO kai auto pepei na allaksei       
-            directory = os.path.dirname(os.path.abspath(__file__))+'/children_playing'
+            directory = '/home/klwnos/Documents/children_playing'
 
             # create or open spatial index
             p = index.Property()
@@ -161,12 +168,12 @@ class UI(wx.Frame):
                 con.commit()
                 con.close()
 
-
+    # dropDB and spatial index
     def dropDB(self,e):
         con = None
         try:
             # TODO kai auto prepei na allaksei
-            con = psycopg2.connect(database='testdb2', user='tabrianos')
+            con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
             cur.execute("DROP TABLE metadata")
@@ -180,33 +187,15 @@ class UI(wx.Frame):
             if con:
                 con.commit()
                 con.close()
+                os.remove('rtreez.data')
+                os.remove('rtreez.index')
 
         
-    def metadataQuery(self,e):
-
-        global metadataText
-        filename = str(metadataText.GetValue())
-
-        con = psycopg2.connect(database='testdb', user='klwnos')
-        cur = con.cursor()
-
-        query = """SELECT * FROM metadata
-                WHERE id = %s;"""
-        data = (filename,)
-        cur.execute(query, data)
-        records = cur.fetchall()
-
-        return records
-
-
     def OnRightDown(self,e):
         self.PopupMenu(MyPopupMenu(self), e.GetPosition())
 
 
 
-        
-
-        
 def main():
    
     ex=wx.App()
