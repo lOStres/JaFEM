@@ -1,5 +1,4 @@
 from jafem import *
-from readdata import *
 from rtree import index
 
 import wx
