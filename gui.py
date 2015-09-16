@@ -130,25 +130,33 @@ class UI(wx.Frame):
             rtree = index.Index('rtreez', properties=p, interleaved=True)
             index_id = 1
 
+            exts = ['wav', 'mp3', 'flac', 'aif', 'ogg', 'aiff']
+
             print("scanning directory", directory)
             # scanning directory and inserting values to db
-            for filename in os.listdir(directory):
+            for filename in os.listdir(directory): # parse csv files
+
                 name , extension = filename.rsplit('.',1);
 
-                if not name:
+                if extension != 'csv':
                     continue;
 
-                # parse meta-data
-                if extension == "csv":
-                    meta = parseCSV(directory, filename)
+                meta = parseCSV(directory, filename)
 
-                    query = """INSERT INTO metadata
-                    (id, startime, endtime, saliance, class)
-                    VALUES (%s, %s, %s, %s, %s);"""
-                    data = (name, meta[0], meta[1], meta[2], meta[3])
-                    cur.execute(query, data)
+                query = """INSERT INTO metadata
+                (id, startime, endtime, saliance, class)
+                VALUES (%s, %s, %s, %s, %s);"""
+                data = (name, meta[0], meta[1], meta[2], meta[3])
+                cur.execute(query, data)
 
-                elif extension == "json":
+            for filename in os.listdir(directory): # parse json and audio files
+
+                name , extension = filename.rsplit('.',1);
+
+                if extension == 'csv':
+                    continue;
+
+                if extension == "json":
                     meta = parseJSON(directory, filename)
 
                     query = """UPDATE metadata SET filesize = %s,
@@ -157,7 +165,7 @@ class UI(wx.Frame):
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
                     cur.execute(query, data)
 
-                else:
+                elif extension in exts:
                     featureVector = extractFeatures(directory,filename)
 
                     link = directory + '/' + name + '.' + extension
