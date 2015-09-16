@@ -58,13 +58,35 @@ class UI(wx.Frame):
     def contentQuery(self,e):
         global kneighbText
         kneighbours = kneighbText.GetValue()
-        print(kneighbours)
+
         dlg=wx.FileDialog(self,"Choose a file", self.dirname,"", "*.*", wx.OPEN)
+
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetFilename()
             self.dirname = dlg.GetDirectory()
+
+            con = psycopg2.connect(database='testdb', user='klwnos')
+            cur = con.cursor()
+
             nearest = similarity(self.dirname, self.filename, int(kneighbours))
-            print(nearest)
+            records = {}
+
+            for i in range(1, len(nearest)+1):
+
+                query = """SELECT * FROM metadata
+                        WHERE id = %s;"""
+
+                data = (nearest[i-1],)
+                cur.execute(query, data)
+                row = cur.fetchall()
+                records[i] = [nearest[i-1], row]
+
+            # present results
+            for obj in records:
+                print str(obj) + " - filename: ", records[obj][0]
+                print "filesize: ",records[obj][1][0][1], "bytes, duration: ",records[obj][1][0][2], "sec, samplerate: ",records[obj][1][0][3], "Hz"
+                print "tags: ", records[obj][1][0][4]
+                print "path: ", records[obj][1][0][-1]
         dlg.Destroy()
 
     # make metadata based query
