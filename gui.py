@@ -96,10 +96,12 @@ class UI(wx.Frame):
 
             # present results
             for obj in records:
-                print str(obj) + " - filename: ", records[obj][0]
+
+                print str(obj) + " - filename: ", str(records[obj][0])+"."+records[obj][1][0][5]
                 print "filesize: ",records[obj][1][0][1], "bytes, duration: ",records[obj][1][0][2], "sec, samplerate: ",records[obj][1][0][3], "Hz"
                 print "tags: ", records[obj][1][0][4]
                 print "path: ", records[obj][1][0][-1]
+
         dlg.Destroy()
 
     # make metadata based query
@@ -114,7 +116,12 @@ class UI(wx.Frame):
         data = (filename,)
         cur.execute(query1, data)
         records = cur.fetchall()
-        print(records)
+        # present results
+        print ">>>> filename: ",str(records[0][0])+"."+records[0][5]
+        print "filesize: ",records[0][1], "bytes, duration: ",records[0][2], "sec, samplerate: ",records[0][3], "Hz"
+
+        print "tags: ", records[0][4]
+        print "path: ", records[0][-1]
 
     # initialize db and spatial index
     def initializeDB(self,e):
