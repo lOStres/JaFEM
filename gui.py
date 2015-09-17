@@ -7,6 +7,21 @@ import psycopg2
 
 APP_EXIT=1
 
+#--------------------------SQL queries----------------------------------------#
+query1 = """SELECT * FROM metadata WHERE id = %s;"""
+query2 = """INSERT INTO metadata (id, startime, endtime, saliance, class) VALUES (%s, %s, %s, %s, %s);"""
+query3 = """UPDATE metadata SET filesize = %s, duration = %s, samplerate = %s, tags = %s, type = %s WHERE id = %s;"""
+query4 = """UPDATE metadata SET link = %s WHERE id = %s;"""
+
+create = """CREATE TABLE metadata
+                    (id INT PRIMARY KEY, filesize INT, duration FLOAT,
+                    samplerate INT, tags VARCHAR(200) ARRAY, type VARCHAR(7),
+                    saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
+                    class VARCHAR(20), link VARCHAR(200));"""
+
+drop = """DROP TABLE metadata"""
+#-----------------------------------------------------------------------------#
+
 class UI(wx.Frame):
 
     def __init__(self,*args,**kwargs):
@@ -73,11 +88,9 @@ class UI(wx.Frame):
 
             for i in range(1, len(nearest)+1):
 
-                query = """SELECT * FROM metadata
-                        WHERE id = %s;"""
 
                 data = (nearest[i-1],)
-                cur.execute(query, data)
+                cur.execute(query1, data)
                 row = cur.fetchall()
                 records[i] = [nearest[i-1], row]
 
@@ -98,10 +111,8 @@ class UI(wx.Frame):
         con = psycopg2.connect(database='testdb', user='klwnos')
         cur = con.cursor()
 
-        query = """SELECT * FROM metadata
-                WHERE id = %s;"""
         data = (filename,)
-        cur.execute(query, data)
+        cur.execute(query1, data)
         records = cur.fetchall()
         print(records)
 
@@ -113,11 +124,7 @@ class UI(wx.Frame):
             con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
-            cur.execute('''CREATE TABLE metadata
-                    (id INT PRIMARY KEY, filesize INT, duration FLOAT,
-                    samplerate INT, tags VARCHAR(200) ARRAY, type VARCHAR(7),
-                    saliance VARCHAR(5), startime FLOAT, endtime FLOAT,
-                    class VARCHAR(20), link VARCHAR(200));''')
+            cur.execute(create)
             # TODO kai auto pepei na allaksei       
             directory = '/home/klwnos/Documents/children_playing'
 
@@ -143,11 +150,8 @@ class UI(wx.Frame):
 
                 meta = parseCSV(directory, filename)
 
-                query = """INSERT INTO metadata
-                (id, startime, endtime, saliance, class)
-                VALUES (%s, %s, %s, %s, %s);"""
                 data = (name, meta[0], meta[1], meta[2], meta[3])
-                cur.execute(query, data)
+                cur.execute(query2, data)
 
             for filename in os.listdir(directory): # parse json and audio files
 
@@ -159,11 +163,8 @@ class UI(wx.Frame):
                 if extension == "json":
                     meta = parseJSON(directory, filename)
 
-                    query = """UPDATE metadata SET filesize = %s,
-                        duration = %s, samplerate = %s, tags = %s, type = %s
-                        WHERE id = %s;"""
                     data = (meta[0], meta[1], meta[2], meta[3], meta[4], name)
-                    cur.execute(query, data)
+                    cur.execute(query3, data)
 
                 elif extension in exts:
                     featureVector = extractFeatures(directory,filename)
@@ -182,10 +183,8 @@ class UI(wx.Frame):
                         featureVector[10], featureVector[11],
                         featureVector[12]))
 
-                    query = """UPDATE metadata SET link = %s
-                        WHERE id = %s;"""
                     data = (link, name)
-                    cur.execute(query, data)
+                    cur.execute(query4, data)
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
@@ -205,7 +204,7 @@ class UI(wx.Frame):
             con = psycopg2.connect(database='testdb', user='klwnos')
             cur = con.cursor()
 
-            cur.execute("DROP TABLE metadata")
+            cur.execute(drop)
 
         except psycopg2.DatabaseError as err:
             print( 'Error %s' % err)
